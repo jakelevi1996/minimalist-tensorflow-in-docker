@@ -31,9 +31,6 @@ class NeuralClassifier:
         # Create op for initialising variables
         self.init_op = tf.global_variables_initializer()
 
-        # Create Saver object for saving
-        self.saver = tf.train.Saver()
-
         # Create summaries, for visualising in Tensorboard
         tf.summary.scalar("Loss", self.loss_op)
         tf.summary.histogram("Hidden_layer_activations", self.hidden_op)
@@ -44,10 +41,6 @@ class NeuralClassifier:
 
     def initialize_variables(self, sess):
         sess.run(self.init_op)
-    
-    def save_model(self, sess, savedir):
-        save_path = self.saver.save(sess, savedir)
-        return save_path
 
     def predict(self, input_val):
         return self.predict_op.eval(
