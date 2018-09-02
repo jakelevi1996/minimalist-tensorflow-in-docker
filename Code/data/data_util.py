@@ -47,16 +47,3 @@ def load_data(filename=DEFAULT_FILENAME):
         y_test = data["y_test"]
     
     return x_train, y_train, x_test, y_test
-        
-
-x = np.arange(6).reshape(-1,2)
-y = classification_rule(x)
-print(x)
-print(y)
-print(type(x))
-print(type(y))
-generate_synthetic_data()
-with np.load("synthetic_data.npz") as data:
-    for i in data:
-        print(i)
-    
