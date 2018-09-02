@@ -1,0 +1,12 @@
+# Using TensorFlow base image for Python 3.5.2
+FROM tensorflow/tensorflow:1.9.0-py3
+
+# Update pip, and install dependencies
+RUN pip install --upgrade pip
+RUN pip install matplotlib==2.2.2
+
+# Set working directory within Docker container filesystem
+WORKDIR /app
+
+
+CMD python --version
