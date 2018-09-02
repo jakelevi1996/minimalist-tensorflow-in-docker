@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import time
 
 DEFAULT_FILENAME = "synthetic_data.npz"
 
@@ -10,7 +11,8 @@ def classification_rule(x):
 
 def generate_synthetic_data(
         num_train=1000,
-        filename=DEFAULT_FILENAME):
+        filename=DEFAULT_FILENAME,
+        prepend_timestamp=False):
     # Create training data set
     x_train = np.random.randn(num_train, 2)
     y_train = classification_rule(x_train)
@@ -24,6 +26,10 @@ def generate_synthetic_data(
         (xx0.reshape(-1,1), xx1.reshape(-1,1)),
         axis=1)
     y_test = classification_rule(x_test)
+
+    # Add timestamp, if specified
+    if prepend_timestamp:
+        filename = time.strftime("%Y.%m.%d-%H.%M.%S-") + filename
 
     # Save npz file
     np.savez(
