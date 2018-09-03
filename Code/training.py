@@ -13,29 +13,32 @@ def display_progress(epoch, loss_val):
 def get_save_dir():
     pass
 
+def training_condition(
+    train_for_epochs,
+    epoch, num_epochs,
+    start_time, num_seconds):
+    pass
 
 def train(
+    model,
+    x_train, y_train,
+    x_test, y_test,
     num_epochs=5000,
     print_every=1000,
     model_name="standard_model",
-    data_filename=DEFAULT_FILENAME,
-    save_dir=None,
+    saved_model_dir=None,
     log_dir=None
     ):
     # Create names for saving of models and summaries, if not specified
     timestamp = time.strftime("%Y.%m.%d-%H.%M.%S-")
-    if save_dir is None:
-        save_dir = "models/" + timestamp + model_name + "/saved_model"
-    logging.info("Saving models in " + save_dir)
+    if saved_model_dir is None:
+        saved_model_dir = "models/" + timestamp + model_name + "/saved_model/"
+    logging.info("Saving models in " + saved_model_dir)
     if log_dir is None:
-        log_dir = "models/" + timestamp + model_name + "/logs"
+        log_dir = "models/" + timestamp + model_name + "/logs/"
     logging.info("Saving tensorboard summaries in " + log_dir)
 
     # TODO: add option to load model for continued training
-    logging.info("Creating model...")
-    model = NeuralClassifier()
-    logging.info("Loading data...")
-    x_train, y_train, x_test, y_test = load_data(data_filename)
     logging.info("Creating Saver object...")
     saver = tf.train.Saver()
 
@@ -63,11 +66,18 @@ def train(
         display_progress(num_epochs, train_loss_val)
 
         logging.info("Saving model...")
-        save_path = saver.save(sess, save_dir)
-        return save_path
+        save_path = saver.save(sess, saved_model_dir)
+    
+    return save_path
 
 
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
-    train()
+    
+    logging.info("Loading data...")
+    x_train, y_train, x_test, y_test = load_data(DEFAULT_FILENAME)
+    logging.info("Creating model...")
+    model = NeuralClassifier()
+
+    train(model, x_train, y_train, x_test, y_test)
