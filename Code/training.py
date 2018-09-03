@@ -28,6 +28,7 @@ def train(
     num_epochs=3000,
     num_seconds=None,
     print_every=1000,
+    log_every=50,
     model_name="standard_model",
     saved_model_dir=None,
     log_dir=None
@@ -52,16 +53,20 @@ def train(
         logging.info("Creating FileWriter for Tensorboard...")
         writer = tf.summary.FileWriter(log_dir, sess.graph)
 
+        train_loss_val, test_loss_val = 0, 0
         logging.info("Entering training loop...")
         for epoch in range(num_epochs):
             # Evaluate graph, summaries, and training op
-            train_loss_val, train_summary_val = \
-                model.training_step_with_progress(sess, x_train, y_train)
-            test_loss_val, test_summary_val = \
-                model.test_set_progress(sess, x_test, y_test)
-            # Add summaries for Tensorboard
-            writer.add_summary(train_summary_val, epoch)
-            writer.add_summary(test_summary_val, epoch)
+            if epoch % log_every == 0:
+                train_loss_val, train_summary_val = \
+                    model.training_step_with_progress(sess, x_train, y_train)
+                test_loss_val, test_summary_val = \
+                    model.test_set_progress(sess, x_test, y_test)
+                # Add summaries for Tensorboard
+                writer.add_summary(train_summary_val, epoch)
+                writer.add_summary(test_summary_val, epoch)
+            else:
+                model.training_step_no_progress(sess, x_train, y_train)
             # Display progress at specified intervals
             if epoch % print_every == 0:
                 display_progress(epoch, train_loss_val, test_loss_val)
@@ -90,4 +95,8 @@ if __name__ == "__main__":
     logging.info("Creating model...")
     model = NeuralClassifier()
 
-    train(model, x_train, y_train, x_test, y_test)
+    train(
+        model, x_train, y_train, x_test, y_test,
+        model_name="logevery50",
+        log_every=50
+    )
