@@ -10,6 +10,9 @@ def display_progress(epoch, loss_val):
     logging.info("Epoch: {:<8} | Train loss: {:<.6f} | Test loss: ".format(
         epoch, loss_val))
 
+def get_save_dir():
+    pass
+
 
 def train(
     num_epochs=5000,
@@ -29,10 +32,12 @@ def train(
     logging.info("Saving tensorboard summaries in " + log_dir)
 
     # TODO: add option to load model for continued training
-    logging.info("Loading data...")
-    x_train, y_train, x_test, y_test = load_data(data_filename)
     logging.info("Creating model...")
     model = NeuralClassifier()
+    logging.info("Loading data...")
+    x_train, y_train, x_test, y_test = load_data(data_filename)
+    logging.info("Creating Saver object...")
+    saver = tf.train.Saver()
 
     logging.info("Creating session...")
     with tf.Session() as sess:
@@ -44,29 +49,25 @@ def train(
         logging.info("Entering training loop...")
         for epoch in range(num_epochs):
             # Evaluate graph, summaries, and training op
-            train_loss_val, summary_val, _ = sess.run([
-                model.loss_op,
-                model.merged_summary_op,
-                model.train_op],
-                feed_dict={
-                    model.input_placeholder: x_train,
-                    model.output_placeholder: y_train})
+            train_loss_val, summary_val = model.training_step(
+                sess, input_data=x_train, input_labels=y_train)
+            # Add summary for Tensorboard
             writer.add_summary(summary_val, epoch)
+            # Display progress at specified intervals
             if epoch % print_every == 0:
                 display_progress(epoch, train_loss_val)
         logging.info("Evaluating final loss...")
-        train_loss_val, summary_val = sess.run([
-            model.loss_op,
-            model.merged_summary_op],
-            feed_dict={
-                model.input_placeholder: x_train,
-                model.output_placeholder: y_train})
+        train_loss_val, summary_val = model.training_step(
+            sess, input_data=x_train, input_labels=y_train)
         writer.add_summary(summary_val, num_epochs)
         display_progress(num_epochs, train_loss_val)
+
+        logging.info("Saving model...")
+        save_path = saver.save(sess, save_dir)
+        return save_path
 
 
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
-    # train(num_epochs=10,print_every=1)
     train()
