@@ -33,24 +33,18 @@ class NeuralClassifier:
         self.init_op = tf.global_variables_initializer()
 
         # Create summaries, for visualising in Tensorboard
-        # TODO: separate train and test loss; visualise gradients
         # Training summaries:
-        train_loss_summary = tf.summary.scalar("Train_loss", self.loss_op)
-        train_hidden_layer_activations_summary = tf.summary.histogram(
-            "Train_hidden_layer_activations", self.hidden_op
-        )
-        train_logits = tf.summary.histogram("Train_logits", self.logit_op)
         # tf.summary.scalar("Accuracy", accuracy)
-        # tf.summary.histogram("Gradients", adam.compute_gradients(loss))
+        variables = tf.trainable_variables()
+        gradients = tf.gradients(self.loss_op, variables)
         self.train_summary_op = tf.summary.merge([
-            train_loss_summary,
-            train_hidden_layer_activations_summary,
-            train_logits
+            tf.summary.scalar("Train_loss", self.loss_op),
+            *[tf.summary.histogram(v.name, v) for v in variables],
+            *[tf.summary.histogram(g.name, g) for g in gradients]
         ])
         # Test summaries:
-        test_loss_summary = tf.summary.scalar("Test_loss", self.loss_op)
         self.test_summary_op = tf.summary.merge([
-            test_loss_summary,
+            tf.summary.scalar("Test_loss", self.loss_op),
             # <Other test summaries>
         ])
         
