@@ -2,6 +2,13 @@
 **/__pycache__/
 **.npz
 
-# Ignore saved models, but not scripts
+# Ignore saved models, but not scripts, or a benchmark saved model
 Code/models/*
 !Code/models/*.py
+!Code/models/benchmark
+
+# Ignore tensorboard logs
+Code/results/*
+
+# Ignore images
+**.png
