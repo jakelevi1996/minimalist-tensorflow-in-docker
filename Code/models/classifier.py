@@ -19,10 +19,10 @@ class NeuralClassifier:
         self.predict_op = tf.sigmoid(self.logit_op)
 
         # Define loss and optimiser
-        self.output_placeholder = tf.placeholder(
+        self.labels_placeholder = tf.placeholder(
             dtype=tf.float32, shape=(None, 1))
         self.loss_op = tf.losses.sigmoid_cross_entropy(
-            self.output_placeholder, self.logit_op)
+            self.labels_placeholder, self.logit_op)
         self.optimizer = tf.train.AdamOptimizer(learning_rate)
         self.train_op = self.optimizer.minimize(self.loss_op)
         # TODO: add accuracy op
@@ -32,6 +32,7 @@ class NeuralClassifier:
         self.init_op = tf.global_variables_initializer()
 
         # Create summaries, for visualising in Tensorboard
+        # TODO: separate train and test loss
         tf.summary.scalar("Loss", self.loss_op)
         tf.summary.histogram("Hidden_layer_activations", self.hidden_op)
         tf.summary.histogram("Logits", self.logit_op)
@@ -45,3 +46,14 @@ class NeuralClassifier:
     def predict(self, input_val):
         return self.predict_op.eval(
             feed_dict={self.input_placeholder: input_val})
+    
+    def training_step(self, sess, input_data, input_labels):
+        train_loss_val, summary_val, _ = sess.run([
+            self.loss_op,
+            self.merged_summary_op,
+            self.train_op],
+            feed_dict={
+                self.input_placeholder: input_data,
+                self.labels_placeholder: input_labels})
+        return train_loss_val, summary_val
+        
