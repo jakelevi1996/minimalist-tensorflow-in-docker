@@ -1,5 +1,8 @@
 import tensorflow as tf
 import logging
+# Before importing pyplot, set the matplotlib backend to allow usage in Docker container
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
 def infer(model, saved_model_dir, x_test):
@@ -29,7 +32,6 @@ def plot_predictions(
     x0 = x_test[:,0].reshape(100, 100)
     x1 = x_test[:,1].reshape(100, 100)
     y_pred = y_pred.reshape(100, 100)
-    print(x0.shape, y_pred.shape)
     
     plt.contour(
         x0, x1, y_pred,

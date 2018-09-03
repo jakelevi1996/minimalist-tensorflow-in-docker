@@ -1,7 +1,17 @@
 .vscode
 **/__pycache__/
-**.npz
 
-# Ignore saved models, but not scripts
+# Ignore saved models, but not python modules, or a benchmark saved model
 Code/models/*
 !Code/models/*.py
+!Code/models/benchmark
+
+# Ignore tensorboard logs and images
+Code/results/*
+
+# Ignore data files, but not python modules
+Code/data/*
+!Code/data/*.py
+
+# Ignore virtual environment
+venv/
