@@ -4,6 +4,25 @@ Minimalist example of running a simple Tensorflow program in a docker container,
 
 ## TODO
 
+- Make a good README
+- Add docstrings to all function
 - Populate inference module
 - Optionally visualise predictions through course of training
 - Rename repo as `minimalist-tensorflow-in-docker`
+- Tidy up filename manipulation
+- Add usage description to README.md
+- Add test loss to training module
+- Add accuracy to classifier and training modules
+- Add regularisation to classifer module
+- Add option to load module for continued training in training module
+- Update package to use `tf.data` API
+- Fix bug for repeated training in `for` loop
+- Add option to train for number of seconds (instead of number of epochs)
+- Pass data to training module from main module (not from load_data)?
+- Save results (tensorboard summaries, graphs) in a `results/` folder, not in `models/` folder
+- Test saving and restoring of model for different/unknown model params
+- Add `requirements.txt`
+- Write Dockerfiles and scripts to automate building and running them
+- Add option to specify interval for logging to tensorboard: logging every epoch is probably slow
+- Add batching to inputs
+- Add dropout
