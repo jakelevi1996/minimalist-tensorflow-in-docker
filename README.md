@@ -8,7 +8,6 @@ Minimalist example of running a simple Tensorflow program in a docker container,
 - Add usage description to README.md
 - Add docstrings to all functions
 - Write Dockerfiles and scripts to automate building and running them
-- Optionally visualise predictions through course of training
 - Rename repo as `minimalist-tensorflow-in-docker`
 - Tidy up filename manipulation (including *optional* timestamps in filenames)
 - Add accuracy to classifier and training modules

@@ -12,11 +12,19 @@ logging.basicConfig(level=logging.INFO)
 logging.info("Loading data...")
 x_train, y_train, x_test, y_test = load_data()
 logging.info("Creating model...")
-model = NeuralClassifier()
+model = NeuralClassifier(
+    num_hidden_units=3,
+    # hidden_layer_activation_function=tf.nn.relu
+)
 
 saved_model_dir = train(
     model, x_train, y_train, x_test, y_test,
-    # num_epochs=3
+    model_name="h3",
+    plot_every=100
 )
 
-plot_predictions(model, saved_model_dir, x_train, y_train, x_test, y_test)
+plot_predictions(
+    model,
+    x_train, y_train, x_test, y_test,
+    saved_model_dir=saved_model_dir
+)

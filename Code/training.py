@@ -1,9 +1,9 @@
 import tensorflow as tf
 import logging
 import time
-from data.data_util import load_data, DEFAULT_FILENAME
+from data.data_util import load_data
 from models.classifier import NeuralClassifier
-
+from inference import plot_predictions
 
 
 def display_progress(epoch, train_loss_val, test_loss_val=None):
@@ -29,6 +29,7 @@ def train(
     num_seconds=None,
     print_every=1000,
     log_every=50,
+    plot_every=5000,
     model_name="standard_model",
     saved_model_dir=None,
     log_dir=None
@@ -56,7 +57,7 @@ def train(
         train_loss_val, test_loss_val = 0, 0
         logging.info("Entering training loop...")
         for epoch in range(num_epochs):
-            # Evaluate graph, summaries, and training op
+            # Evaluate loss, summaries, and training op
             if epoch % log_every == 0:
                 train_loss_val, train_summary_val = \
                     model.training_step_with_progress(sess, x_train, y_train)
@@ -70,6 +71,13 @@ def train(
             # Display progress at specified intervals
             if epoch % print_every == 0:
                 display_progress(epoch, train_loss_val, test_loss_val)
+            if epoch % plot_every == 0:
+                plot_predictions(
+                    model, x_train, y_train, x_test, y_test,
+                    sess=sess,
+                    saved_image_path="results/epoch {}.png".format(epoch)
+                )
+
         
         # End of training loop
         logging.info("Evaluating final loss...")
@@ -91,12 +99,14 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
     
     logging.info("Loading data...")
-    x_train, y_train, x_test, y_test = load_data(DEFAULT_FILENAME)
+    x_train, y_train, x_test, y_test = load_data()
     logging.info("Creating model...")
-    model = NeuralClassifier()
+    model = NeuralClassifier(num_hidden_units=4)
 
     train(
         model, x_train, y_train, x_test, y_test,
-        model_name="logevery50",
-        log_every=50
+        # log_dir="results/temp/"
+        num_epochs=3000,
+        log_every=200,
+        model_name="h4"
     )

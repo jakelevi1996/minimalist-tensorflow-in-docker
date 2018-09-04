@@ -1,7 +1,8 @@
 import tensorflow as tf
 import numpy as np
 import logging
-# Before importing pyplot, set the matplotlib backend to allow usage in Docker container
+# Before importing pyplot, set the matplotlib backend
+# to allow usage in Docker container
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
@@ -19,12 +20,15 @@ def infer(model, saved_model_dir, x_test):
 
 
 def plot_predictions(
-    model, saved_model_dir,
+    model,
     x_train, y_train,
     x_test, y_test,
-    saved_image_path="results/classification-results.png"
+    saved_model_dir=None,
+    sess=None,
+    saved_image_path="results/final-classification-results.png"
 ):
     logging.info("Plotting results...")
+    plt.figure()
     plt.plot(
         x_train[y_train[:,0]==0, 0], x_train[y_train[:,0]==0, 1], 'bo',
         x_train[y_train[:,0]==1, 0], x_train[y_train[:,0]==1, 1], 'ro',
@@ -36,13 +40,18 @@ def plot_predictions(
     # Create grid for evaluation of test set
     x_array = np.linspace(-4, 4, 100)
     xx0, xx1 = np.meshgrid(x_array, x_array)
-    
     x_grid = np.concatenate(
         (xx0.reshape(-1,1), xx1.reshape(-1,1)),
         axis=1
     )
-    
-    y_grid = infer(model, saved_model_dir, x_grid)
+    if sess is not None:
+        y_grid = model.predict(sess, x_grid)
+    elif saved_model_dir is not None:
+        y_grid = infer(model, saved_model_dir, x_grid)
+    else:
+        raise ValueError(
+            "A saved model directory or a session must be specified"
+        )
 
     plt.contour(
         xx0, xx1, y_grid.reshape(xx0.shape),
@@ -50,5 +59,6 @@ def plot_predictions(
     plt.grid(True)
     plt.axis('equal')
 
-    logging.info("Saving figure...")
     plt.savefig(saved_image_path)
+    # Close figure after saving to reduce memory consumption
+    plt.close()
