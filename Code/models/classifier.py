@@ -1,5 +1,18 @@
 import tensorflow as tf
 
+def parse_name(name):
+    """
+    Used to make sure that the name passed to `tf.summary.histogram` does not
+    contain any illegal characters.
+    Args:
+    - name: name to be parsed
+    Returns:
+    - name: parsed name with no illegal characters
+    """
+    while ":" in name:
+        name = name[:-1]
+    return name
+
 class NeuralClassifier:
     def __init__(
         self,
@@ -11,20 +24,34 @@ class NeuralClassifier:
         # Define network
         # TODO: add regulariser
         self.input_placeholder = tf.placeholder(
-            dtype=tf.float32, shape=(None, input_dim))
+            dtype=tf.float32,
+            shape=(None, input_dim),
+            name="Input"
+        )
         self.hidden_op = tf.layers.dense(
             inputs=self.input_placeholder,
             units=num_hidden_units,
-            activation=hidden_layer_activation_function)
-        self.logit_op = tf.layers.dense(inputs=self.hidden_op, units=1)
-        self.predict_op = tf.sigmoid(self.logit_op)
+            activation=hidden_layer_activation_function,
+            name="Input_layer"
+        )
+        self.logit_op = tf.layers.dense(
+            inputs=self.hidden_op,
+            units=1,
+            name="Hidden_layer"
+        )
+        self.predict_op = tf.sigmoid(
+            self.logit_op,
+            name="Prediction"
+        )
 
         # Define loss and optimiser
         # TODO: add accuracy op
         self.labels_placeholder = tf.placeholder(
-            dtype=tf.float32, shape=(None, 1))
+            dtype=tf.float32, shape=(None, 1), name="Labels"
+        )
         self.loss_op = tf.losses.sigmoid_cross_entropy(
-            self.labels_placeholder, self.logit_op)
+            self.labels_placeholder, self.logit_op
+        )
         self.optimizer = tf.train.AdamOptimizer(learning_rate)
         self.train_op = self.optimizer.minimize(self.loss_op)
         # accuracy = tf.reduce_mean(tf.cast(tf.equal(y, y_true), tf.float32)) # need y>.5
@@ -39,8 +66,8 @@ class NeuralClassifier:
         gradients = tf.gradients(self.loss_op, variables)
         self.train_summary_op = tf.summary.merge([
             tf.summary.scalar("Train_loss", self.loss_op),
-            *[tf.summary.histogram(v.name, v) for v in variables],
-            *[tf.summary.histogram(g.name, g) for g in gradients]
+            *[tf.summary.histogram(parse_name(v.name), v) for v in variables],
+            *[tf.summary.histogram(parse_name(g.name), g) for g in gradients]
         ])
         # Test summaries:
         self.test_summary_op = tf.summary.merge([
@@ -59,7 +86,7 @@ class NeuralClassifier:
         )
         return predictions
     
-    def training_step_with_progress(self, sess, x_train, y_train):
+    def training_step_with_summary(self, sess, x_train, y_train):
         train_loss_val, train_summary_val, _ = sess.run([
             self.loss_op,
             self.train_summary_op,
@@ -71,7 +98,7 @@ class NeuralClassifier:
         )
         return train_loss_val, train_summary_val
 
-    def training_step_no_progress(self, sess, x_train, y_train):
+    def training_step_no_summary(self, sess, x_train, y_train):
         sess.run(
             self.train_op,
             feed_dict={
@@ -80,7 +107,7 @@ class NeuralClassifier:
             }
         )
     
-    def test_set_progress(self, sess, x_test, y_test):
+    def test_set_summary(self, sess, x_test, y_test):
         test_loss_val, test_summary_val = sess.run([
             self.loss_op,
             self.test_summary_op],
