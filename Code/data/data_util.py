@@ -11,20 +11,15 @@ def classification_rule(x):
 
 def generate_synthetic_data(
         num_train=1000,
+        num_test=200,
         filename=DEFAULT_FILENAME,
         prepend_timestamp=False):
     # Create training data set
     x_train = np.random.randn(num_train, 2)
     y_train = classification_rule(x_train)
 
-    # Create grid for evaluation of test set
-    x_array = np.linspace(-4, 4, 100)
-    xx0, xx1 = np.meshgrid(x_array, x_array)
-    
     # Create test data set
-    x_test = np.concatenate(
-        (xx0.reshape(-1,1), xx1.reshape(-1,1)),
-        axis=1)
+    x_test = np.random.randn(num_test, 2)
     y_test = classification_rule(x_test)
 
     # Add timestamp, if specified
