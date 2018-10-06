@@ -9,7 +9,6 @@ WORKDIR /app
 
 # Update pip, and install dependencies
 RUN python -m pip install --upgrade pip
-# RUN pip install tensorflow=1.9.0
 ADD requirements.txt .
 RUN pip install -r requirements.txt
 RUN apt-get update && apt-get install -y python3-tk
@@ -27,4 +26,10 @@ ADD Code/ .
 # Debug: print current states of directories
 # RUN pwd; echo "Current dir:"; ls; echo "data:"; ls data; python --version;
 
-CMD python main.py
+# Run tensorboard in background
+EXPOSE 6007
+# RUN tensorboard --logdir results --port 6007 &
+
+# CMD python main.py
+ADD container-script.sh .
+CMD bash container-script.sh

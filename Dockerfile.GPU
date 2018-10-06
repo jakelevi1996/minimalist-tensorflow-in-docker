@@ -1,0 +1,20 @@
+# Using TensorFlow base image for Python 3.5.2
+FROM tensorflow/tensorflow:1.9.0-gpu-py3
+
+# Set working directory within Docker container filesystem
+WORKDIR /app
+
+# Update pip, and install dependencies
+RUN python -m pip install --upgrade pip
+ADD requirements.txt .
+RUN pip install -r requirements.txt
+RUN apt-get update && apt-get install -y python3-tk
+
+# Generate synthetic data within the Docker container
+ADD Code/data/data_util.py data/data_util.py
+RUN python data/data_util.py
+
+# Add contents of Code folder to working directory
+ADD Code/ .
+
+CMD python main.py

@@ -1,7 +1,11 @@
 @echo OFF
 
 echo Building Docker image...
-docker build -f Dockerfile.CPU -t tf-img .
+docker build -f Dockerfile.CPU -t tf-cpu-img .
 
 echo Running Docker image...
-docker run --rm -it tf-img
+docker run ^
+    -p 127.0.0.1:6007:6007 ^
+    --rm ^
+    -it ^
+    tf-cpu-img 
